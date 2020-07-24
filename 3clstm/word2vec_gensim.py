@@ -82,5 +82,4 @@ def save(embeddings):
         pickle.dump(word2vec,f)
 save(embeddings)
 end=time.time()
-print("Over job in ",end-start)
-print("Saved words vec to",vec_dir)
+print("Job took ",end-start)

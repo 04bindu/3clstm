@@ -2,7 +2,7 @@ import nltk
 import re
 from urllib.parse import unquote
 import tensorflow as tf
-import keras.backend.tensorflow_backend as ktf
+# import keras.backend.tensorflow_backend as ktf
 def GeneSeg(payload):
     #数字泛化为"0"
     payload=payload.lower()
@@ -27,4 +27,4 @@ def GeneSeg(payload):
     return nltk.regexp_tokenize(payload, r)
 def init_session():
     #gpu_options=tf.GPUOptions(allow_growth=True)
-    tf.compat.v1.Session()
+    ktf.set_session(tf.Session())

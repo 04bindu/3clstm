@@ -9,7 +9,6 @@ from processing import dataTest
 from keras.layers.convolutional import ZeroPadding1D
 
 import matplotlib.pyplot as plt
-init_session()
 batch_size=100
 epochs_num=1
 process_datas_dir="file/process_datas.pickle"
@@ -47,11 +46,11 @@ def train(train_generator,train_size,input_num,dims_num,model_dir):
     # call=TensorBoard(log_dir=log_dir,write_grads=True,histogram_freq=0)#将histogram_freq的值由1改成0
     model=Model(inputs=inputs,outputs=output)
     model.compile(optimizer,loss="categorical_crossentropy",metrics=["accuracy"])
-    model.fit_generator(train_generator,steps_per_epoch=train_size//batch_size,epochs=epochs_num,callbacks=None)
+    model.fit_generator(train_generator,steps_per_epoch=train_size//(batch_size*epochs_num),epochs=epochs_num,callbacks=None)
 #    model.fit_generator(train_generator, steps_per_epoch=5, epochs=5, callbacks=[call])
     model.save(model_dir)
     end=time.time()
-    print("Over train job in %f s"%(end-start))
+    print("Training took %f s"%(end-start))
     print(model.summary())
 
 if __name__=="__main__":

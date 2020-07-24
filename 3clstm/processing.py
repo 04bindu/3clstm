@@ -6,7 +6,6 @@ from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split,StratifiedKFold,KFold
 import tensorflow as tf
 
-import matplotlib.pyplot as plt
 from keras.models import load_model
 from keras import backend as K
 from sklearn.metrics import precision_score,recall_score,accuracy_score,f1_score
@@ -68,10 +67,12 @@ def pre_process():
     labels=[labels[index] for index in rand]
 
 
-
     folder=KFold(n_splits=10,shuffle=False,random_state=0)
     number=0
     for train,test in folder.split(datas,labels):
+
+        train = np.random.choice(train, size = len(train), replace = False)
+        test = np.random.choice(test, size = len(test), replace = False)
 
         train_datas=[datas[i] for i in train]
         test_datas=[datas[i] for i in test]
@@ -88,18 +89,11 @@ def pre_process():
         word2vec["input_num"]=input_num
         word2vec["dims_num"]=dims_num
 
-        # print(train_size)
-        # print(test_size)
-        # print(input_num)
-        # print(dims_num)
-
-        print("Write trian datas")
         with open(pre_datas_trains[number],"w") as f:
             for i in range(train_size):
                 data_line=str(train_datas[i].tolist())+"|"+str(train_labels[i].tolist())+"\n"
                 f.write(data_line)
 
-        print("Write test datas")
         with open(pre_datas_tests[number],"w") as f:
             for i in range(test_size):
                 data_line=str(test_datas[i].tolist())+"|"+str(test_labels[i].tolist())+"\n"
@@ -109,32 +103,31 @@ def pre_process():
 
     with open(vec_dir, "wb") as f:
         pickle.dump(word2vec, f)
-    print("Saved word2vec to:", vec_dir)
 
-    print("Write datas over!")
 def data_generator(data_dir):
-    reader = tf.compat.v1.TextLineReader()
-    queue = tf.compat.v1.train.string_input_producer([data_dir])
-    _, value = reader.read(queue)
-    coord = tf.train.Coordinator()
-    sess = tf.compat.v1.Session()
-    threads = tf.compat.v1.train.start_queue_runners(sess=sess, coord=coord)
-    while True:
-        v = sess.run(value)
-        [data, label] = v.split(b"|")
-        data = np.array(json.loads(data.decode("utf-8")))
-        label = np.array(json.loads(label.decode("utf-8")))
-        yield (data, label)
-    coord.request_stop()
-    coord.join(threads)
-    sess.close()
-    #df = tf.data.TextLineDataset([data_dir])
-    #print(df)
-    #for line in df:
-    #    [data, label] = tf.strings.split(line, b"|").numpy()
+    #value = tf.data.TextLineDataset([data_dir])
+    #reader = tf.TextLineReader()
+    #queue = tf.train.string_input_producer([data_dir])
+    #_, value = reader.read(queue)
+    #coord = tf.train.Coordinator()
+    #sess = tf.Session()
+    #threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+    #while True:
+    #    v = value
+    #    [data, label] = v.split(b"|")
     #    data = np.array(json.loads(data.decode("utf-8")))
     #    label = np.array(json.loads(label.decode("utf-8")))
     #    yield (data, label)
+    #coord.request_stop()
+    #coord.join(threads)
+    #sess.close()
+    df = tf.data.TextLineDataset([data_dir])
+    #print(df)
+    for line in df:
+        [data, label] = tf.strings.split(line, b"|").numpy()
+        data = np.array(json.loads(data.decode("utf-8")))
+        label = np.array(json.loads(label.decode("utf-8")))
+        yield (data, label)
 
 def batch_generator(datas_dir,datas_size,batch_size,embeddings,reverse_dictionary,train=True):
     batch_data = []
@@ -254,23 +247,5 @@ def dataTest(model_dir,test_generator,test_size,input_num,dims_num,batch_size):
     print("TP rate is :",tpr)
     print("Roc_AOC is :",roc_auc)
 
-    plt.switch_backend('agg')
-    # plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Luck')
-    plt.plot(fpr, tpr, alpha=0.8)#, label='3C-LSTM(area=%0.4f)' % (roc_auc)
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('ROC curve for test dataset Zoom in at top left ')
-    # plt.legend(loc="lower right")
-    plt.xlim(0,0.1)
-    plt.ylim(0.2,1)
-    plt.savefig('roc')
-
-
-
 if __name__=="__main__":
     pre_process()
-
-
-
-
-
