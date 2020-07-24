@@ -1,3 +1,7 @@
+#!/usr/bin/python
+
+import sys
+
 import time
 from keras.models import Sequential,Model
 from keras.layers import Dense,Dropout,LSTM,Conv1D,Input,concatenate
@@ -8,8 +12,8 @@ from utils import init_session
 from processing import dataTest
 from keras.layers.convolutional import ZeroPadding1D
 
-batch_size=100
-epochs_num=1
+batch_size=int(sys.argv[0])
+epochs_num=int(sys.argv[1])
 process_datas_dir="file/process_datas.pickle"
 log_dir="log/CNN_LSTM4.log"
 model_dirs=["file/CNN_LSTM4_1_model","file/CNN_LSTM4_2_model","file/CNN_LSTM4_3_model",
@@ -20,12 +24,23 @@ def train(train_generator,train_size,input_num,dims_num,model_dir):
     start=time.time()
     inputs=Input(shape=(input_num,dims_num))
 
-    pathway1=Conv1D(128,2,activation="relu")(inputs)
-    pathway2 = Conv1D(128, 4,activation="relu")(inputs)
-    pathway2=ZeroPadding1D(padding=1)(pathway2)
-    pathway3 = Conv1D(128, 6,activation="relu")(inputs)
-    pathway3=ZeroPadding1D(padding=2)(pathway3)
-    con = concatenate([pathway1,pathway2,pathway3])
+    if int(sys.argv[2]) == 0:
+        con = inputs
+    elif int(sys.argv[2]) == 1:
+        con=Conv1D(128,2,activation="relu")(inputs)
+    elif int(sys.argv[2]) == 2:
+        pathway2 = Conv1D(128, 4,activation="relu")(inputs)
+        con=ZeroPadding1D(padding=1)(pathway2)
+    elif int(sys.argv[2]) == 3:
+        pathway3 = Conv1D(128, 6,activation="relu")(inputs)
+        con=ZeroPadding1D(padding=2)(pathway3)
+    else:
+        pathway1=Conv1D(128,2,activation="relu")(inputs)
+        pathway2 = Conv1D(128, 4,activation="relu")(inputs)
+        pathway2=ZeroPadding1D(padding=1)(pathway2)
+        pathway3 = Conv1D(128, 6,activation="relu")(inputs)
+        pathway3=ZeroPadding1D(padding=2)(pathway3)
+        con = concatenate([pathway1,pathway2,pathway3])
 
     #============================
     layer1=LSTM(128)(con)
@@ -54,6 +69,5 @@ def train(train_generator,train_size,input_num,dims_num,model_dir):
 if __name__=="__main__":
     train_generators, test_generators, train_size, test_size, input_num, dims_num= build_dataset(
         batch_size)
-    for i in range(10):
-        train(train_generators[i], train_size, input_num, dims_num,model_dir=model_dirs[i])
-        dataTest(model_dirs[i], test_generators[i], test_size, input_num, dims_num, batch_size)
+    train(train_generators[0], train_size, input_num, dims_num,model_dir=model_dirs[0])
+    dataTest(model_dirs[0], test_generators[0], test_size, input_num, dims_num, batch_size)

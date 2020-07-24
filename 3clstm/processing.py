@@ -1,3 +1,7 @@
+#!/usr/bin/python
+
+import sys
+
 from utils import GeneSeg
 import csv,pickle,random,json
 import numpy as np
@@ -67,20 +71,46 @@ def pre_process():
     labels=[labels[index] for index in rand]
 
 
-    folder=KFold(n_splits=10,shuffle=False,random_state=0)
-    number=0
-    for train,test in folder.split(datas,labels):
+    if sys.argv[0] == 'kfold':
+        folder=KFold(n_splits=10,shuffle=False,random_state=0)
+        number=0
+        for train,test in folder.split(datas,labels):
 
-        train = np.random.choice(train, size = len(train), replace = False)
-        test = np.random.choice(test, size = len(test), replace = False)
+            train = np.random.choice(train, size = len(train)/int(sys.argv[2]), replace = False)
+            test = np.random.choice(test, size = len(test)/int(sys.argv[2]), replace = False)
 
-        train_datas=[datas[i] for i in train]
-        test_datas=[datas[i] for i in test]
-        train_labels=[labels[i] for i in train]
-        test_labels=[labels[i] for i in test]
+            train_datas=[datas[i] for i in train]
+            test_datas=[datas[i] for i in test]
+            train_labels=[labels[i] for i in train]
+            test_labels=[labels[i] for i in test]
+            train_size=len(train_labels)
+            test_size=len(test_labels)
+
+
+            input_num=len(train_datas[0])
+            dims_num = embeddings["UNK"].shape[0]
+            word2vec["train_size"]=train_size
+            word2vec["test_size"]=test_size
+            word2vec["input_num"]=input_num
+            word2vec["dims_num"]=dims_num
+
+            with open(pre_datas_trains[number],"w") as f:
+                for i in range(train_size):
+                    data_line=str(train_datas[i].tolist())+"|"+str(train_labels[i].tolist())+"\n"
+                    f.write(data_line)
+
+            with open(pre_datas_tests[number],"w") as f:
+                for i in range(test_size):
+                    data_line=str(test_datas[i].tolist())+"|"+str(test_labels[i].tolist())+"\n"
+                    f.write(data_line)
+
+            number=number+1
+
+    else:
+        train_datas, test_datas, train_labels, test_labels = train_test_split(datas, labels, test_size = float(sys.argv[1]))
+
         train_size=len(train_labels)
         test_size=len(test_labels)
-
 
         input_num=len(train_datas[0])
         dims_num = embeddings["UNK"].shape[0]
@@ -89,17 +119,16 @@ def pre_process():
         word2vec["input_num"]=input_num
         word2vec["dims_num"]=dims_num
 
-        with open(pre_datas_trains[number],"w") as f:
+        with open(pre_datas_trains[0],"w") as f:
             for i in range(train_size):
                 data_line=str(train_datas[i].tolist())+"|"+str(train_labels[i].tolist())+"\n"
                 f.write(data_line)
 
-        with open(pre_datas_tests[number],"w") as f:
+        with open(pre_datas_tests[0],"w") as f:
             for i in range(test_size):
                 data_line=str(test_datas[i].tolist())+"|"+str(test_labels[i].tolist())+"\n"
                 f.write(data_line)
 
-        number=number+1
 
     with open(vec_dir, "wb") as f:
         pickle.dump(word2vec, f)
