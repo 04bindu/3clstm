@@ -71,13 +71,13 @@ def pre_process():
     labels=[labels[index] for index in rand]
 
 
-    if sys.argv[0] == 'kfold':
+    if sys.argv[1] == 'kfold':
         folder=KFold(n_splits=10,shuffle=False,random_state=0)
         number=0
         for train,test in folder.split(datas,labels):
 
-            train = np.random.choice(train, size = len(train)/int(sys.argv[2]), replace = False)
-            test = np.random.choice(test, size = len(test)/int(sys.argv[2]), replace = False)
+            train = np.random.choice(train, size = len(train)/int(sys.argv[3]), replace = False)
+            test = np.random.choice(test, size = len(test)/int(sys.argv[3]), replace = False)
 
             train_datas=[datas[i] for i in train]
             test_datas=[datas[i] for i in test]
@@ -107,7 +107,7 @@ def pre_process():
             number=number+1
 
     else:
-        train_datas, test_datas, train_labels, test_labels = train_test_split(datas, labels, test_size = float(sys.argv[1]))
+        train_datas, test_datas, train_labels, test_labels = train_test_split(datas, labels, test_size = float(sys.argv[2]))
 
         train_size=len(train_labels)
         test_size=len(test_labels)

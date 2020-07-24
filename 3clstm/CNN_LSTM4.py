@@ -12,8 +12,8 @@ from utils import init_session
 from processing import dataTest
 from keras.layers.convolutional import ZeroPadding1D
 
-batch_size=int(sys.argv[0])
-epochs_num=int(sys.argv[1])
+batch_size=int(sys.argv[1])
+epochs_num=int(sys.argv[2])
 process_datas_dir="file/process_datas.pickle"
 log_dir="log/CNN_LSTM4.log"
 model_dirs=["file/CNN_LSTM4_1_model","file/CNN_LSTM4_2_model","file/CNN_LSTM4_3_model",
@@ -24,14 +24,14 @@ def train(train_generator,train_size,input_num,dims_num,model_dir):
     start=time.time()
     inputs=Input(shape=(input_num,dims_num))
 
-    if int(sys.argv[2]) == 0:
+    if int(sys.argv[3]) == 0:
         con = inputs
-    elif int(sys.argv[2]) == 1:
+    elif int(sys.argv[3]) == 1:
         con=Conv1D(128,2,activation="relu")(inputs)
-    elif int(sys.argv[2]) == 2:
+    elif int(sys.argv[3]) == 2:
         pathway2 = Conv1D(128, 4,activation="relu")(inputs)
         con=ZeroPadding1D(padding=1)(pathway2)
-    elif int(sys.argv[2]) == 3:
+    elif int(sys.argv[3]) == 3:
         pathway3 = Conv1D(128, 6,activation="relu")(inputs)
         con=ZeroPadding1D(padding=2)(pathway3)
     else:
