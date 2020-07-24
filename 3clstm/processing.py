@@ -76,8 +76,8 @@ def pre_process():
         number=0
         for train,test in folder.split(datas,labels):
 
-            train = np.random.choice(train, size = len(train)/int(sys.argv[3]), replace = False)
-            test = np.random.choice(test, size = len(test)/int(sys.argv[3]), replace = False)
+            train = np.random.choice(train, size = len(train)//int(sys.argv[3]), replace = False)
+            test = np.random.choice(test, size = len(test)//int(sys.argv[3]), replace = False)
 
             train_datas=[datas[i] for i in train]
             test_datas=[datas[i] for i in test]
