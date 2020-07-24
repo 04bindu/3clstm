@@ -8,7 +8,6 @@ from utils import init_session
 from processing import dataTest
 from keras.layers.convolutional import ZeroPadding1D
 
-import matplotlib.pyplot as plt
 batch_size=100
 epochs_num=1
 process_datas_dir="file/process_datas.pickle"
@@ -18,7 +17,6 @@ model_dirs=["file/CNN_LSTM4_1_model","file/CNN_LSTM4_2_model","file/CNN_LSTM4_3_
             "file/CNN_LSTM4_7_model","file/CNN_LSTM4_8_model","file/CNN_LSTM4_9_model",
             "file/CNN_LSTM4_10_model"]
 def train(train_generator,train_size,input_num,dims_num,model_dir):
-    print("Start Train Job! ")
     start=time.time()
     inputs=Input(shape=(input_num,dims_num))
 

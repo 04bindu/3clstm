@@ -7,5 +7,6 @@ RUN pip install \
     keras \
     gensim
 
-COPY 3clstm/ /
-RUN mkdir 3clstm/3clstm/file
+RUN mkdir /3clstm/
+COPY 3clstm/ /3clstm/
+RUN mkdir /3clstm/file
